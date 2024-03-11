@@ -4,6 +4,7 @@
         "MQTT/MQTT/lib/bson-3.10.1.jar",
         "MQTT/MQTT/lib/jackson-mapper-asl-1.5.0.jar",
         "MQTT/MQTT/lib/mongo-java-driver-3.6.3.jar",
-        "MQTT/MQTT/lib/org.eclipse.paho.client.mqttv3-1.1.0.jar"
+        "MQTT/MQTT/lib/org.eclipse.paho.client.mqttv3-1.1.0.jar",
+        "MQTT/MQTT/CloudtoMongo.jar"
     ]
 }

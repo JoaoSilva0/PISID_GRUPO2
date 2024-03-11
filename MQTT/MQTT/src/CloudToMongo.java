@@ -21,7 +21,7 @@ public class CloudToMongo implements MqttCallback {
     private static DB db;
     private static JTextArea documentLabel = new JTextArea("\n");
 
-    private static final String CONFIG_FILE = "cloudToMongo.ini";
+    private static final String CONFIG_FILE = "CloudToMongo.ini";
 
     public static void main(String[] args) {
         createWindow();
