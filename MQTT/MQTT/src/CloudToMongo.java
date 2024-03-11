@@ -14,12 +14,16 @@ import java.io.FileInputStream;
 import java.io.IOException;
 import java.util.Properties;
 import java.util.Random;
+import java.time.LocalDate;
+import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
 
 public class CloudToMongo implements MqttCallback {
     private MqttClient mqttClient;
     private static MongoClient mongoClient;
     private static DB db;
     private static JTextArea documentLabel = new JTextArea("\n");
+    private static  DateTimeFormatter myFormatObj = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss");
 
     private static final String CONFIG_FILE = "CloudToMongo.ini";
 
@@ -102,23 +106,58 @@ public class CloudToMongo implements MqttCallback {
 
     @Override
     public void messageArrived(String topic, MqttMessage message) throws Exception {
-        try {
-            DBCollection collection;
-            if (topic.equals("pisid_mazemov")) {
-                collection = db.getCollection("medicoesPassagem");
-            } else if (topic.equals("pisid_mazetemp")) {
-                collection = db.getCollection("medicoesTemperatura");
-            } else {
-                System.out.println("Unknown topic: " + topic);
-                return;
-            }
-
-            DBObject document_json = (DBObject) JSON.parse(message.toString());
-            collection.insert(document_json);
-            documentLabel.append(message.toString() + "\n");
-        } catch (Exception e) {
-            System.out.println(e);
+        DBCollection collection;
+        DBObject document_json; 
+        String payloadAsString = new String(message.getPayload());
+        if (topic.equals("pisid_mazemov")) {
+            collection = db.getCollection("medicoesPassagem");
+        } else if (topic.equals("pisid_mazetemp")) {
+            collection = db.getCollection("medicoesTemperatura");
+        } else {
+            System.out.println("Unknown topic: " + topic);
+            return;
         }
+
+       
+
+        if(message.toString().contains("@") 
+        ||message.toString().contains("&")
+        ||message.toString().contains("#") 
+        ||message.toString().contains("!") 
+        ||message.toString().contains("^")
+        ||message.toString().contains("(")
+        ||message.toString().contains(")")
+        ||message.toString().contains("_")
+        ||message.toString().contains("+")
+        ||message.toString().contains("=")
+        ||message.toString().contains("?")
+        ||message.toString().contains("%")
+        ||message.toString().contains("*")) { 
+    
+            String[] mensagem = payloadAsString.split(",");
+            String mensagemAnomala = mensagem[0]+ ", Leitura: null ," + mensagem[2];
+            String nullMessage = payloadAsString.replace(payloadAsString, mensagemAnomala);
+            document_json = (DBObject) JSON.parse(nullMessage);
+
+        } else if (!message.toString().contains(LocalDate.now().toString())) {
+            
+            String[] split_time = new String(message.getPayload()).split(",");
+            String[] split_time2 = new String(message.getPayload()).split(" "); 
+            System.out.println(split_time2[1]+split_time[1]);
+            
+            LocalDateTime myDateObj = LocalDateTime.now();
+            String formattedDate = myDateObj.format(myFormatObj);
+            String date_error = payloadAsString.replace(split_time2[1], "'"+formattedDate.toString());
+            String date_error2 = date_error.replace(split_time2[2],"',");
+            System.out.println(date_error2);
+            document_json = (DBObject) JSON.parse(date_error2);
+
+        } else {
+            document_json = (DBObject) JSON.parse(message.toString());
+        }
+
+        collection.insert(document_json);
+        documentLabel.append(message.toString() + "\n");
     }
 
     @Override
