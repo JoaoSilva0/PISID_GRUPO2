@@ -3,12 +3,6 @@ import org.eclipse.paho.client.mqttv3.MqttCallback;
 import org.eclipse.paho.client.mqttv3.MqttClient;
 import org.eclipse.paho.client.mqttv3.MqttException;
 import org.eclipse.paho.client.mqttv3.MqttMessage;
-import org.eclipse.paho.client.mqttv3.IMqttDeliveryToken;
-import org.eclipse.paho.client.mqttv3.MqttCallback;
-import org.eclipse.paho.client.mqttv3.MqttClient;
-import org.eclipse.paho.client.mqttv3.MqttConnectOptions;
-import org.eclipse.paho.client.mqttv3.MqttException;
-import org.eclipse.paho.client.mqttv3.MqttMessage;
 
 import com.mongodb.*;
 import com.mongodb.util.JSON;
@@ -108,8 +102,8 @@ public class CloudToMongo implements MqttCallback {
 
     @Override
     public void messageArrived(String topic, MqttMessage message) throws Exception {
-        DBCollection collection;
         try {
+            DBCollection collection;
             if (topic.equals("pisid_mazemov")) {
                 collection = db.getCollection("medicoesPassagem");
             } else if (topic.equals("pisid_mazetemp")) {
@@ -118,24 +112,12 @@ public class CloudToMongo implements MqttCallback {
                 System.out.println("Unknown topic: " + topic);
                 return;
             }
-           
-            
-        
+
             DBObject document_json = (DBObject) JSON.parse(message.toString());
             collection.insert(document_json);
             documentLabel.append(message.toString() + "\n");
         } catch (Exception e) {
             System.out.println(e);
-            String payloadAsString = new String(message.getPayload());
-            String[] mensagem = payloadAsString.split(",");
-           
-            String mensagemAnamola = "{"+mensagem[1]+ ", null ," + mensagem[2]+"}";
-            DBObject document_LeituraAnomala = (DBObject) JSON.parse(mensagemAnamola);
-            collection = db.getCollection("medicoesTemperatura");
-            collection.insert(document_LeituraAnomala);
-            documentLabel.append(message.toString() + "\n");
-            return;
-            
         }
     }
 
