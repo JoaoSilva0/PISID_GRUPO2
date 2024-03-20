@@ -50,7 +50,7 @@ public class WriteMySql {
             JOptionPane.showMessageDialog(null, "The WriteMysql ini file wasn't found.", "Data Migration", JOptionPane.ERROR_MESSAGE);
         }
         connectDatabase_to();
-       // ReadData();
+        //ReadData(); // Não há necessidade de chamar ReadData() aqui
     }
 
     public static void connectDatabase_to() {
@@ -64,11 +64,8 @@ public class WriteMySql {
         }
     }
 
-    public static void ReadData(String topic, String message) {
-        WriteToMySQL(message);
-    }
+    // Método ReadData removido, pois não estava sendo utilizado e causaria um erro de compilação
 
-        
     public static void WriteToMySQL(String c) {
         String convertedjson = c;
         String fields = "";
