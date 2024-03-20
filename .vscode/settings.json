@@ -5,6 +5,8 @@
         "MQTT/MQTT/lib/jackson-mapper-asl-1.5.0.jar",
         "MQTT/MQTT/lib/mongo-java-driver-3.6.3.jar",
         "MQTT/MQTT/lib/org.eclipse.paho.client.mqttv3-1.1.0.jar",
-        "MQTT/MQTT/CloudtoMongo.jar"
+        "MQTT/MQTT/CloudtoMongo.jar",
+        "c:\\Users\\35196\\Downloads\\mariadb-java-client-2.7.3.jar",
+        "c:\\Users\\35196\\Downloads\\WriteMysql.jar"
     ]
 }

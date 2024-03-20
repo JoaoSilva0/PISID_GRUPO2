@@ -3,6 +3,12 @@ import org.eclipse.paho.client.mqttv3.persist.MemoryPersistence;
 
 public class MQTTSubscriber {
 
+    private static WriteMySql writeMySql;
+
+    public MQTTSubscriber(WriteMySql writeMySql) {
+        this.writeMySql = writeMySql;
+    }
+
     public static void main(String[] args) {
         String broker = "tcp://broker.mqtt-dashboard.com:1883";
         String clientId = "JavaMQTTSubscriber";
@@ -21,6 +27,7 @@ public class MQTTSubscriber {
                     System.out.println("Mensagem recebida:");
                     System.out.println("   Tópico: " + topic);
                     System.out.println("   Mensagem: " + new String(message.getPayload()));
+                    writeMySql.ReadData(topic, new String(message.getPayload()));
                 }
 
                 @Override
