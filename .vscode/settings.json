@@ -7,6 +7,8 @@
         "MQTT/MQTT/lib/org.eclipse.paho.client.mqttv3-1.1.0.jar",
         "MQTT/MQTT/CloudtoMongo.jar",
         "c:\\Users\\35196\\Downloads\\mariadb-java-client-2.7.3.jar",
-        "c:\\Users\\35196\\Downloads\\WriteMysql.jar"
+        "c:\\Users\\35196\\Downloads\\WriteMysql.jar",
+        "c:\\Users\\pedro\\Downloads\\mariadb-java-client-2.7.3.jar",
+        "c:\\Users\\pedro\\Downloads\\WriteMysql.jar"
     ]
 }

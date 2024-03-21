@@ -55,8 +55,15 @@ public class WriteMySql {
 
     public static void connectDatabase_to() {
         try {
+            Properties p = new Properties();
+            p.load(new FileInputStream("WriteMysql.ini"));
+            sql_table_to = p.getProperty("sql_table_to");
+            sql_database_connection_to = p.getProperty("sql_database_connection_to");
+            sql_database_password_to = p.getProperty("sql_database_password_to");
+            sql_database_user_to = p.getProperty("sql_database_user_to");
             Class.forName("org.mariadb.jdbc.Driver");
             connTo = DriverManager.getConnection(sql_database_connection_to, sql_database_user_to, sql_database_password_to);
+            //System.err.println(connTo.getMetaData());
             documentLabel.append("SQl Connection:" + sql_database_connection_to + "\n");
             documentLabel.append("Connection To MariaDB Destination " + sql_database_connection_to + " Suceeded" + "\n");
         } catch (Exception e) {
@@ -78,14 +85,14 @@ public class WriteMySql {
         String x = convertedjson.toString();
         String[] splitArray = x.split(",");
         for (int i = 0; i < splitArray.length; i++) {
-            String[] splitArray2 = splitArray[i].split(":");
+            String[] splitArray2 = splitArray[i].split(" :");
             if (i == 0) fields = splitArray2[0];
             else fields = fields + ", " + splitArray2[0];
             if (i == 0) values = splitArray2[1];
             else values = values + ", " + splitArray2[1];
         }
         fields = fields.replace("\"", "");
-        SqlCommando = "Insert into " + sql_table_to + " (" + fields.substring(1, fields.length()) + ") values (" + values.substring(0, values.length() - 1) + ");";
+        SqlCommando = "Insert into " + sql_table_to + " (" + fields.substring(2, fields.length()) + ") values (" + values.substring(3, values.length() - 1) + ");";
         try {
             documentLabel.append(SqlCommando.toString() + "\n");
         } catch (Exception e) {

@@ -13,8 +13,8 @@ public class MQTTSubscriber {
         String broker = "tcp://broker.mqtt-dashboard.com:1883";
         String clientId = "JavaMQTTSubscriber";
         MemoryPersistence persistence = new MemoryPersistence();
-
         try {
+            WriteMySql.connectDatabase_to();
             MqttClient mqttClient = new MqttClient(broker, clientId, persistence);
             mqttClient.setCallback(new MqttCallback() {
                 @Override
@@ -27,7 +27,7 @@ public class MQTTSubscriber {
                     System.out.println("Mensagem recebida:");
                     System.out.println("   Tópico: " + topic);
                     System.out.println("   Mensagem: " + new String(message.getPayload()));
-                   
+                    WriteMySql.WriteToMySQL(new String(message.getPayload()));
                 }
 
                 @Override
