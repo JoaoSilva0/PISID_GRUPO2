@@ -92,7 +92,7 @@ public class WriteMySql {
             else values = values + ", " + splitArray2[1];
         }
         fields = fields.replace("\"", "");
-        SqlCommando = "Insert into " + sql_table_to + " (" + fields.substring(2, fields.length()) + ") values (" + values.substring(3, values.length() - 1) + ");";
+        SqlCommando = "Insert into " + sql_table_to + " (" + fields.substring(7, fields.length()) + ") values (" + values.substring(11, values.length() - 1) + ");";
         try {
             documentLabel.append(SqlCommando.toString() + "\n");
         } catch (Exception e) {
