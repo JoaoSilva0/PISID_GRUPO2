@@ -7,7 +7,7 @@ import org.bson.types.ObjectId;
 
 public class MongoToMQTT {
     
-    public static void main(String[] args) {
+    public static void main(String[] args) throws InterruptedException {
         ObjectId objectId = null;
         long timestampMiliSeconds = 0;
         // Configuração do MongoDB
@@ -21,38 +21,42 @@ public class MongoToMQTT {
         // Configuração do MQTT
         String broker = "tcp://broker.mqtt-dashboard.com:1883";
         String clientId = "JavaMongoToMQTT";
-        try {
-            MqttClient mqttClient = new MqttClient(broker, clientId);
-            mqttClient.connect();
-            
-            Document query = new Document("_id", new Document("$gt", timestampMiliSeconds));
-            // Extração e publicação dos dados da coleção 1
-            for (Document doc : collection1.find()) {
-                String message = doc.toJson();
-                MqttMessage mqttMessage = new MqttMessage(message.getBytes());
-                System.out.println(message);
-                mqttClient.publish("pisid_grupo2_joaosilva_temperatura", mqttMessage);
-         
+        while(true) {
+            try {
+                MqttClient mqttClient = new MqttClient(broker, clientId);
+                mqttClient.connect();
+                System.out.println(timestampMiliSeconds);
+                Document query = new Document("_id", new Document("$gt", timestampMiliSeconds));
+                // Extração e publicação dos dados da coleção 1
+                for (Document doc : collection1.find()) {
+                    String message = doc.toJson();
+                    MqttMessage mqttMessage = new MqttMessage(message.getBytes());
+                    System.out.println(message);
+                    mqttClient.publish("pisid_grupo2_joaosilva_temperatura", mqttMessage);
+             
+                }
+                
+                // Extração e publicação dos dados da coleção 2
+                for (Document doc : collection2.find(query)) {
+                    String message = doc.toJson();
+                    MqttMessage mqttMessage = new MqttMessage(message.getBytes());
+                    mqttClient.publish("pisid_grupo2_joaosilva_passagem", mqttMessage);
+    
+                    String[] splitedMessage = message.trim().split(",");
+                    String values = splitedMessage[0].split(": ")[2];
+                    objectId = new ObjectId(values.substring(0, values.length()-2));
+                    System.out.println(objectId);
+                    timestampMiliSeconds = objectId.getTimestamp() * 1000;
+                }
+                
+                //mqttClient.disconnect();
+                //mongoClient.close();
+            } catch (MqttException e) {
+                e.printStackTrace();
             }
-            
-            // Extração e publicação dos dados da coleção 2
-            for (Document doc : collection2.find()) {
-                String message = doc.toJson();
-                MqttMessage mqttMessage = new MqttMessage(message.getBytes());
-                mqttClient.publish("pisid_grupo2_joaosilva_passagem", mqttMessage);
-
-                String[] splitedMessage = message.trim().split(",");
-                String values = splitedMessage[0].split(" : ")[2];
-                objectId = new ObjectId(values.substring(0, values.length()-2));
-                timestampMiliSeconds = objectId.getTimestamp() * 1000;
-                System.out.println(message);
-            }
-            
-            mqttClient.disconnect();
-            mongoClient.close();
-        } catch (MqttException e) {
-            e.printStackTrace();
+            Thread.sleep(2000);
         }
+        
     }
 
    
