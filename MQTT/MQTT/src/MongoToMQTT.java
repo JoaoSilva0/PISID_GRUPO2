@@ -47,7 +47,7 @@ public class MongoToMQTT {
                     objectId = convertString(message);
                 }
                 
-                /*                // Extração e publicação dos dados da coleção 2
+                // Extração e publicação dos dados da coleção 2
                 for (Document doc : collection2.find(query)) {
                     String message = doc.toJson();
                     MqttMessage mqttMessage = new MqttMessage(message.getBytes());
@@ -55,7 +55,7 @@ public class MongoToMQTT {
     
                    
                 }
-                 */
+                 
 
                 //mqttClient.disconnect();
                 //mongoClient.close();
