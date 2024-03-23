@@ -2,71 +2,93 @@ import com.mongodb.MongoClient;
 import com.mongodb.client.MongoCollection;
 import com.mongodb.client.MongoDatabase;
 import org.bson.Document;
-import org.eclipse.paho.client.mqttv3.*;
 import org.bson.types.ObjectId;
+import org.eclipse.paho.client.mqttv3.*;
+
+import java.util.concurrent.ExecutionException;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
+import java.util.concurrent.Future;
+import java.util.concurrent.TimeUnit;
 
 public class MongoToMQTT {
+    static ObjectId objectId1 = null; // Resetting objectId for each iteration
+    static ObjectId objectId2 = null;
     
     public static ObjectId convertString(String message) {
         String[] splitedMessage = message.trim().split(",");
         String values = splitedMessage[0].split(": ")[2];
         String cleanedString = values.substring(1, values.length()-2);
-        ObjectId objectId = new ObjectId(cleanedString);
-        return objectId;
-        //return objectId.getTimestamp() * 1000;
+        return new ObjectId(cleanedString);
     }
 
     public static void main(String[] args) throws InterruptedException {
-        long timestampMiliSeconds = 0;
-        ObjectId objectId = null;
-        // Configuração do MongoDB
+        // MongoDB Configuration
         MongoClient mongoClient = new MongoClient("localhost", 27017);
         MongoDatabase database = mongoClient.getDatabase("ExperienciaRatos");
         
-        // Coleções MongoDB
+        // MongoDB Collections
         MongoCollection<Document> collection1 = database.getCollection("medicoesTemperatura");
         MongoCollection<Document> collection2 = database.getCollection("medicoesPassagem");
 
-        // Configuração do MQTT
+        // MQTT Configuration
         String broker = "tcp://broker.mqtt-dashboard.com:1883";
         String clientId = "JavaMongoToMQTT";
+
+        // Executor service for managing threads
         while(true) {
             try {
+                ExecutorService executor = Executors.newFixedThreadPool(2);
+
                 MqttClient mqttClient = new MqttClient(broker, clientId);
                 mqttClient.connect();
-                Document query = new Document();
-                if (objectId != null) {
-                    query.append("_id", new Document("$gt", objectId));
-                }
-                System.out.println(query);
-                // Extração e publicação dos dados da coleção 1
-                for (Document doc : collection1.find(query)) {
-                    String message = doc.toJson();
-                    MqttMessage mqttMessage = new MqttMessage(message.getBytes());
-                    mqttClient.publish("pisid_grupo2_joaosilva_temperatura", mqttMessage);
-                    objectId = convertString(message);
-                }
                 
-                /*                // Extração e publicação dos dados da coleção 2
-                for (Document doc : collection2.find(query)) {
-                    String message = doc.toJson();
-                    MqttMessage mqttMessage = new MqttMessage(message.getBytes());
-                    mqttClient.publish("pisid_grupo2_joaosilva_passagem", mqttMessage);
-    
-                   
-                }
-                 */
+                
+                // Submitting tasks to the executor service for concurrent execution
+                Future<ObjectId> future1 = executor.submit(() -> extractAndPublish(collection1, objectId1, mqttClient, "pisid_grupo2_joaosilva_temperatura"));
+                Future<ObjectId> future2 = executor.submit(() -> extractAndPublish(collection2, objectId2, mqttClient, "pisid_grupo2_joaosilva_passagem"));
 
-                //mqttClient.disconnect();
-                //mongoClient.close();
+                objectId1 = future1.get(); // Get the returned objectId from the future
+                objectId2 = future2.get();
+                
+                // Wait for all threads to finish execution before moving to the next iteration
+                executor.shutdown();
+                executor.awaitTermination(Long.MAX_VALUE, TimeUnit.MILLISECONDS);
+                
+                // Disconnect MQTT client
+                mqttClient.disconnect();
+            } catch (MqttException e) {
+                e.printStackTrace();
+            } catch (ExecutionException e) {
+                // TODO Auto-generated catch block
+                e.printStackTrace();
+            }
+            
+            // Delay between iterations
+            Thread.sleep(5000);
+        }
+    }
+    
+    // Method to extract documents from collection, publish to MQTT, and update objectId
+    private static ObjectId extractAndPublish(MongoCollection<Document> collection, ObjectId objectId, MqttClient mqttClient, String topic) {
+        Document query = new Document();
+        if (objectId != null) {
+            query.append("_id", new Document("$gt", objectId));
+            System.out.println(query);
+        }
+        
+        for (Document doc : collection.find(query)) {
+            String message = doc.toJson();
+            System.out.println(message);
+            MqttMessage mqttMessage = new MqttMessage(message.getBytes());
+            try {
+                mqttClient.publish(topic, mqttMessage);
             } catch (MqttException e) {
                 e.printStackTrace();
             }
-            Thread.sleep(2000);
+            objectId = doc.getObjectId("_id");
         }
-        
+        return objectId;
     }
-
-   
-    
 }
+

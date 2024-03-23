@@ -71,8 +71,6 @@ public class WriteMySql {
         }
     }
 
-    // Método ReadData removido, pois não estava sendo utilizado e causaria um erro de compilação
-
     public static void WriteToMySQL(String c) {
         String convertedjson = c;
         String fields = "";
