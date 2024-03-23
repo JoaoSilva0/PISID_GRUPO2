@@ -47,11 +47,8 @@ public class MongoToMQTT {
                 mqttClient.connect();
                 
                 // Submitting tasks to the executor service for concurrent execution
-                Future<ObjectId> future1 = executor.submit(() -> extractAndPublish(collection1, bookmarks, objectId1, mqttClient, "pisid_grupo2_joaosilva_temperatura", "medicoesTemperatura"));
-                Future<ObjectId> future2 = executor.submit(() -> extractAndPublish(collection2, bookmarks, objectId2, mqttClient, "pisid_grupo2_joaosilva_passagem", "medicoesPassagem"));
-
-                objectId1 = future1.get(); // Get the returned objectId from the future
-                objectId2 = future2.get();
+                executor.submit(() -> extractAndPublish(collection1, bookmarks, mqttClient, "pisid_grupo2_joaosilva_temperatura", "medicoesTemperatura"));
+                executor.submit(() -> extractAndPublish(collection2, bookmarks, mqttClient, "pisid_grupo2_joaosilva_passagem", "medicoesPassagem"));
                 
                 // Wait for all threads to finish execution before moving to the next iteration
                 executor.shutdown();
@@ -61,9 +58,6 @@ public class MongoToMQTT {
                 mqttClient.disconnect();
             } catch (MqttException e) {
                 e.printStackTrace();
-            } catch (ExecutionException e) {
-                // TODO Auto-generated catch block
-                e.printStackTrace();
             }
             
             // Delay between iterations
@@ -71,12 +65,15 @@ public class MongoToMQTT {
         }
     }
     
-    // Method to extract documents from collection, publish to MQTT, and update objectId
-    private static ObjectId extractAndPublish(MongoCollection<Document> collection, MongoCollection<Document> bookmarks, ObjectId objectId, MqttClient mqttClient, String topic, String collectionName) {
+    // Method to extract documents from collection, publish to MQTT, and update bookmarks
+    private static void extractAndPublish(MongoCollection<Document> collection, MongoCollection<Document> bookmarks, MqttClient mqttClient, String topic, String collectionName) {
+        Document bookmarkQuery = new Document("collectionName", collectionName);
+        Document bookmarkDocument = bookmarks.find(bookmarkQuery).first();
+        ObjectId lastProcessedId = bookmarkDocument != null ? bookmarkDocument.getObjectId("lastProcessedId") : null;
+    
         Document query = new Document();
-        if (objectId != null) {
-            query.append("_id", new Document("$gt", objectId));
-            System.out.println(query);
+        if (lastProcessedId != null) {
+            query.append("_id", new Document("$gt", lastProcessedId));
         }
         
         for (Document doc : collection.find(query)) {
@@ -85,15 +82,13 @@ public class MongoToMQTT {
             MqttMessage mqttMessage = new MqttMessage(message.getBytes());
             try {
                 mqttClient.publish(topic, mqttMessage);
+                lastProcessedId = doc.getObjectId("_id");
+                Document bookmarkUpdate = new Document("$set", new Document("lastProcessedId", lastProcessedId));
+                bookmarks.updateOne(bookmarkQuery, bookmarkUpdate, new UpdateOptions().upsert(true));
             } catch (MqttException e) {
                 e.printStackTrace();
             }
-            objectId = doc.getObjectId("_id");
-            Document bookmarkQuery = new Document("collectionName", collectionName);
-            Document bookmarkUpdate = new Document("$set", new Document("lastProcessedId", objectId));
-            bookmarks.updateOne(bookmarkQuery, bookmarkUpdate, new UpdateOptions().upsert(true));
         }
-        return objectId;
     }
 }
 
