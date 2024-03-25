@@ -15,6 +15,7 @@ public class MQTTSubscriber {
         MemoryPersistence persistence = new MemoryPersistence();
         try {
             WriteMySql.connectDatabase_to();
+            WriteMySql.writeConfiguration();
             MqttClient mqttClient = new MqttClient(broker, clientId, persistence);
             mqttClient.setCallback(new MqttCallback() {
                 @Override
