@@ -27,12 +27,6 @@ public class MongoToMQTT {
         MongoCollection<Document> collection2 = database.getCollection("medicoesPassagem");
         MongoCollection<Document> bookmarks = database.getCollection("bookmarksObjectID");
 
-        //Init bookmarks
-        bookmarks.drop();
-        Document bookmarkTemperatura = new Document("collectionName", "medicoesTemperatura").append("lastProcessedId", null);
-        bookmarks.insertOne(bookmarkTemperatura);
-        Document bookmarkPassagem = new Document("collectionName", "medicoesPassagem").append("lastProcessedId", null);
-        bookmarks.insertOne(bookmarkPassagem);
 
         // MQTT Configuration
         String broker = "tcp://broker.mqtt-dashboard.com:1883";

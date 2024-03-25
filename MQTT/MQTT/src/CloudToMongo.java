@@ -1,3 +1,4 @@
+import org.bson.Document;
 import org.eclipse.paho.client.mqttv3.IMqttDeliveryToken;
 import org.eclipse.paho.client.mqttv3.MqttCallback;
 import org.eclipse.paho.client.mqttv3.MqttClient;
@@ -5,8 +6,11 @@ import org.eclipse.paho.client.mqttv3.MqttException;
 import org.eclipse.paho.client.mqttv3.MqttMessage;
 
 import com.mongodb.*;
+import com.mongodb.client.MongoCollection;
+import com.mongodb.client.MongoDatabase;
 import com.mongodb.util.JSON;
 
+import javax.print.Doc;
 import javax.swing.*;
 import java.awt.*;
 import java.awt.event.*;
@@ -21,7 +25,7 @@ import java.time.format.DateTimeFormatter;
 public class CloudToMongo implements MqttCallback {
     private MqttClient mqttClient;
     private static MongoClient mongoClient;
-    private static DB db;
+    private static MongoDatabase db;
     private static JTextArea documentLabel = new JTextArea("\n");
     private static  DateTimeFormatter myFormatObj = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss");
 
@@ -102,13 +106,19 @@ public class CloudToMongo implements MqttCallback {
         mongoURI += mongoAuthentication.equals("true") ? "/?authSource=admin" : "";
 
         MongoClient mongoClient = new MongoClient(new MongoClientURI(mongoURI));
-        db = mongoClient.getDB(mongoDatabase);
+        db = mongoClient.getDatabase(mongoDatabase);
+        MongoCollection<Document> bookmarks = db.getCollection("bookmarksObjectID");
+        bookmarks.drop();
+        Document bookmarkTemperatura = new Document("collectionName", "medicoesTemperatura").append("lastProcessedId", null);
+        bookmarks.insertOne(bookmarkTemperatura);
+        Document bookmarkPassagem = new Document("collectionName", "medicoesPassagem").append("lastProcessedId", null);
+        bookmarks.insertOne(bookmarkPassagem);
     }
 
     @Override
     public void messageArrived(String topic, MqttMessage message) throws Exception {
-        DBCollection collection;
-        DBObject document_json; 
+        MongoCollection<Document> collection;
+        Document document_json; 
         String payloadAsString = new String(message.getPayload());
         if (topic.equals("pisid_mazemov")) {
             collection = db.getCollection("medicoesPassagem");
@@ -136,7 +146,7 @@ public class CloudToMongo implements MqttCallback {
             String[] mensagem = payloadAsString.split(",");
             String mensagemAnomala = mensagem[0]+ ", Leitura: null ," + mensagem[2];
             String nullMessage = payloadAsString.replace(payloadAsString, mensagemAnomala);
-            document_json = (DBObject) JSON.parse(nullMessage);
+            document_json = Document.parse(nullMessage);
 
         } else if (!message.toString().contains(LocalDate.now().toString())) {
             
@@ -149,13 +159,12 @@ public class CloudToMongo implements MqttCallback {
             String date_error = payloadAsString.replace(split_time2[1], "'"+formattedDate.toString());
             String date_error2 = date_error.replace(split_time2[2],"',");
             System.out.println(date_error2);
-            document_json = (DBObject) JSON.parse(date_error2);
+            document_json = Document.parse(date_error2);
 
         } else {
-            document_json = (DBObject) JSON.parse(message.toString());
+            document_json = Document.parse(payloadAsString);
         }
-        
-        collection.insert(document_json);
+        collection.insertOne(document_json);
         documentLabel.append(message.toString() + "\n");
     }
 
