@@ -1,4 +1,5 @@
 import java.io.FileInputStream;
+import java.io.IOException;
 import java.sql.Connection;
 import java.sql.DriverManager;
 import java.sql.Statement;
@@ -14,6 +15,7 @@ public class WriteMySql {
     static String sql_database_password_to = "";
     static String sql_database_user_to = "";
     static String sql_table_to = "";
+    private static final String BDCloud = "BDCloud.ini";
 
     private static void createWindow() {
         JFrame frame = new JFrame("Data Bridge");
@@ -104,5 +106,17 @@ public class WriteMySql {
             System.out.println("Error Inserting in the database . " + e);
             System.out.println(SqlCommando);
         }
+    }
+
+    public static void writeConfiguration(){
+
+    }
+
+     private static Properties loadConfig() throws IOException {
+        Properties properties = new Properties();
+        try (FileInputStream fis = new FileInputStream(BDCloud)) {
+            properties.load(fis);
+        }
+        return properties;
     }
 }

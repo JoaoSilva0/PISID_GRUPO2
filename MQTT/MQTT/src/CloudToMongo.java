@@ -1,4 +1,3 @@
-import org.bson.Document;
 import org.eclipse.paho.client.mqttv3.IMqttDeliveryToken;
 import org.eclipse.paho.client.mqttv3.MqttCallback;
 import org.eclipse.paho.client.mqttv3.MqttClient;
@@ -6,11 +5,8 @@ import org.eclipse.paho.client.mqttv3.MqttException;
 import org.eclipse.paho.client.mqttv3.MqttMessage;
 
 import com.mongodb.*;
-import com.mongodb.client.MongoCollection;
-import com.mongodb.client.MongoDatabase;
 import com.mongodb.util.JSON;
 
-import javax.print.Doc;
 import javax.swing.*;
 import java.awt.*;
 import java.awt.event.*;
@@ -25,13 +21,12 @@ import java.time.format.DateTimeFormatter;
 public class CloudToMongo implements MqttCallback {
     private MqttClient mqttClient;
     private static MongoClient mongoClient;
-    private static MongoDatabase db;
+    private static DB db;
     private static JTextArea documentLabel = new JTextArea("\n");
     private static  DateTimeFormatter myFormatObj = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss");
 
     private static final String CONFIG_FILE = "CloudToMongo.ini";
 
-    //IMPORTANTE: na implementeação final, arredondar os dados
     public static void main(String[] args) {
         createWindow();
         try {
@@ -106,19 +101,13 @@ public class CloudToMongo implements MqttCallback {
         mongoURI += mongoAuthentication.equals("true") ? "/?authSource=admin" : "";
 
         MongoClient mongoClient = new MongoClient(new MongoClientURI(mongoURI));
-        db = mongoClient.getDatabase(mongoDatabase);
-        MongoCollection<Document> bookmarks = db.getCollection("bookmarksObjectID");
-        bookmarks.drop();
-        Document bookmarkTemperatura = new Document("collectionName", "medicoesTemperatura").append("lastProcessedId", null);
-        bookmarks.insertOne(bookmarkTemperatura);
-        Document bookmarkPassagem = new Document("collectionName", "medicoesPassagem").append("lastProcessedId", null);
-        bookmarks.insertOne(bookmarkPassagem);
+        db = mongoClient.getDB(mongoDatabase);
     }
 
     @Override
     public void messageArrived(String topic, MqttMessage message) throws Exception {
-        MongoCollection<Document> collection;
-        Document document_json; 
+        DBCollection collection;
+        DBObject document_json; 
         String payloadAsString = new String(message.getPayload());
         if (topic.equals("pisid_mazemov")) {
             collection = db.getCollection("medicoesPassagem");
@@ -146,7 +135,7 @@ public class CloudToMongo implements MqttCallback {
             String[] mensagem = payloadAsString.split(",");
             String mensagemAnomala = mensagem[0]+ ", Leitura: null ," + mensagem[2];
             String nullMessage = payloadAsString.replace(payloadAsString, mensagemAnomala);
-            document_json = Document.parse(nullMessage);
+            document_json = (DBObject) JSON.parse(nullMessage);
 
         } else if (!message.toString().contains(LocalDate.now().toString())) {
             
@@ -159,12 +148,18 @@ public class CloudToMongo implements MqttCallback {
             String date_error = payloadAsString.replace(split_time2[1], "'"+formattedDate.toString());
             String date_error2 = date_error.replace(split_time2[2],"',");
             System.out.println(date_error2);
-            document_json = Document.parse(date_error2);
+            document_json = (DBObject) JSON.parse(date_error2);
 
         } else {
-            document_json = Document.parse(payloadAsString);
+            document_json = (DBObject) JSON.parse(message.toString());
         }
-        collection.insertOne(document_json);
+        
+        //String broker = "tcp://broker.mqtt-dashboard.com:1883";
+        //String clientId = "JavaMongoToMQTT";
+        //MqttClient mqttClient = new MqttClient(broker, clientId);
+        //qttClient.publish("pisid_grupo2_joaosilva_passagem",message);
+       // SendToMQTT();
+        collection.insert(document_json);
         documentLabel.append(message.toString() + "\n");
     }
 
@@ -178,5 +173,6 @@ public class CloudToMongo implements MqttCallback {
 
     public void SendToMQTT(String message,String broker,String clientId){
        
+        
     }
 }
