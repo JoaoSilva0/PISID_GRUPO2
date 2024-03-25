@@ -41,8 +41,8 @@ public class MongoToMQTT {
                 mqttClient.connect();
                 
                 // Submitting tasks to the executor service for concurrent execution
-                executor.submit(() -> extractAndPublish(collection1, bookmarks, mqttClient, "pisid_grupo2_joaosilva_temperatura", "medicoesTemperatura"));
-                executor.submit(() -> extractAndPublish(collection2, bookmarks, mqttClient, "pisid_grupo2_joaosilva_passagem", "medicoesPassagem"));
+                executor.submit(() -> extractAndPublish(collection1, bookmarks, mqttClient, "pisid_grupo2_temperatura", "medicoesTemperatura"));
+                executor.submit(() -> extractAndPublish(collection2, bookmarks, mqttClient, "pisid_grupo2_passagem", "medicoesPassagem"));
                 
                 // Wait for all threads to finish execution before moving to the next iteration
                 executor.shutdown();
