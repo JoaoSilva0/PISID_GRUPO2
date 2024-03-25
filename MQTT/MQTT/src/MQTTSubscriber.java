@@ -40,7 +40,7 @@ public class MQTTSubscriber {
             System.out.println("Conectado ao broker MQTT.");
 
             // Inscreva-se em tópicos de interesse
-            String[] topics = {"pisid_grupo2_joaosilva_temperatura", "pisid_grupo2_joaosilva_passagem"};
+            String[] topics = {"pisid_grupo2_temperatura", "pisid_grupo2_passagem"};
             int[] qos = {1, 1}; // QoS (Quality of Service) 1
             mqttClient.subscribe(topics, qos);
             System.out.println("Inscrito nos tópicos MQTT.");
