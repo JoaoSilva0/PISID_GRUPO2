@@ -15,12 +15,12 @@ public class MQTTSubscriber {
         MemoryPersistence persistence = new MemoryPersistence();
         try {
             WriteMySql.connectDatabase_to();
-            WriteMySql.writeConfiguration();
+           // WriteMySql.writeConfiguration();
             MqttClient mqttClient = new MqttClient(broker, clientId, persistence);
             mqttClient.setCallback(new MqttCallback() {
                 @Override
                 public void connectionLost(Throwable cause) {
-                    System.out.println("Conexão perdida com o broker MQTT.");
+                    System.out.println("Conexão perdida com o broker MQTT." + cause);
                 }
 
                 @Override

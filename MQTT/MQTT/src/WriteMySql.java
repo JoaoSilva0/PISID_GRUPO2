@@ -108,40 +108,40 @@ public class WriteMySql {
         }
     }
 
-    public static void writeConfiguration(){
-        String url_cloud = "";
-        String username_cloud = "";
-        String password_cloud = "";
-        try {
-            Properties p = new Properties();
-            p.load(new FileInputStream("BD Cloud.ini"));
-            url_cloud = p.getProperty("url_cloud");
-            username_cloud = p.getProperty("username_cloud");
-            password_cloud = p.getProperty("password_cloud");
-        } catch (Exception e) {
-            System.out.println("Error reading BD Cloud.ini file: " + e.getMessage());
-            return;
-        }
+    // public static void writeConfiguration(){
+    //     String url_cloud = "";
+    //     String username_cloud = "";
+    //     String password_cloud = "";
+    //     try {
+    //         Properties p = new Properties();
+    //         p.load(new FileInputStream("BD Cloud.ini"));
+    //         url_cloud = p.getProperty("url_cloud");
+    //         username_cloud = p.getProperty("username_cloud");
+    //         password_cloud = p.getProperty("password_cloud");
+    //     } catch (Exception e) {
+    //         System.out.println("Error reading BD Cloud.ini file: " + e.getMessage());
+    //         return;
+    //     }
 
-        try {
-            // Estabelecer conexão com o banco de dados
-            Class.forName("org.mariadb.jdbc.Driver");
-            connTo = DriverManager.getConnection(url_cloud, username_cloud, password_cloud);
-            System.out.println("Connection to MariaDB Destination " + url_cloud + " succeeded");
+    //     try {
+    //         // Estabelecer conexão com o banco de dados
+    //         Class.forName("org.mariadb.jdbc.Driver");
+    //         connTo = DriverManager.getConnection(url_cloud, username_cloud, password_cloud);
+    //         System.out.println("Connection to MariaDB Destination " + url_cloud + " succeeded");
 
-            // Executar as operações no banco de dados (por exemplo, inserção de dados)
-            Statement statement = connTo.createStatement();
-            statement.executeUpdate("INSERT INTO configuracaolabirinto (temperaturaprogramada, numerodesalas) VALUES (25.0, 10)");
-            statement.executeUpdate("INSERT INTO corredor (salaa, salab, centimetro) VALUES (1, 2, 100)");
-            statement.close();
+    //         // Executar as operações no banco de dados (por exemplo, inserção de dados)
+    //         Statement statement = connTo.createStatement();
+    //         statement.executeUpdate("INSERT INTO configuracaolabirinto (temperaturaprogramada, numerodesalas) VALUES (25.0, 10)");
+    //         statement.executeUpdate("INSERT INTO corredor (salaa, salab, centimetro) VALUES (1, 2, 100)");
+    //         statement.close();
 
-            // Fechar a conexão após o uso
-            connTo.close();
-        } catch (Exception e) {
-            System.out.println("Error writing to MySQL database: " + e.getMessage());
-        }
+    //         // Fechar a conexão após o uso
+    //         connTo.close();
+    //     } catch (Exception e) {
+    //         System.out.println("Error writing to MySQL database: " + e.getMessage());
+    //     }
     
 
-    }
+    // }
 
 }
