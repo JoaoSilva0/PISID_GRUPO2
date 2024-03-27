@@ -15,7 +15,7 @@ public class WriteMySql {
     static String sql_database_user_to = "";
     static String sql_table_to = "";
 
-    private static void createWindow() {
+    private void createWindow() {
         JFrame frame = new JFrame("Data Bridge");
         frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         JLabel textLabel = new JLabel("Data : ", SwingConstants.CENTER);
@@ -37,7 +37,6 @@ public class WriteMySql {
     }
 
     public static void main(String[] args) {
-        WriteToMySQL("{\"_id\": {\"$oid\": \"65f7193bad7d8b40ac47eca5\"}, \"Hora\": \"2024-03-17 16:24:27.352877\", \"Leitura\": 5, \"Sensor\": 2}");
         try {
             Properties p = new Properties();
             p.load(new FileInputStream("WriteMysql.ini"));
@@ -49,11 +48,10 @@ public class WriteMySql {
             System.out.println("Error reading WriteMysql.ini file " + e);
             JOptionPane.showMessageDialog(null, "The WriteMysql ini file wasn't found.", "Data Migration", JOptionPane.ERROR_MESSAGE);
         }
-        connectDatabase_to();
-        //ReadData(); // Não há necessidade de chamar ReadData() aqui
+        //connectDatabase_to();
     }
 
-    public static void connectDatabase_to() {
+    public void connectDatabase_to() {
         try {
             Properties p = new Properties();
             p.load(new FileInputStream("WriteMysql.ini"));
@@ -61,9 +59,9 @@ public class WriteMySql {
             sql_database_connection_to = p.getProperty("sql_database_connection_to");
             sql_database_password_to = p.getProperty("sql_database_password_to");
             sql_database_user_to = p.getProperty("sql_database_user_to");
-            Class.forName("org.mariadb.jdbc.Driver");
+           // Class.forName("org.mariadb.jdbc.Driver");
             connTo = DriverManager.getConnection(sql_database_connection_to, sql_database_user_to, sql_database_password_to);
-            //System.err.println(connTo.getMetaData());
+            System.err.println(connTo.getMetaData());
             documentLabel.append("SQl Connection:" + sql_database_connection_to + "\n");
             documentLabel.append("Connection To MariaDB Destination " + sql_database_connection_to + " Suceeded" + "\n");
         } catch (Exception e) {
@@ -71,9 +69,7 @@ public class WriteMySql {
         }
     }
 
-    // Método ReadData removido, pois não estava sendo utilizado e causaria um erro de compilação
-
-    public static void WriteToMySQL(String c) {
+    public void WriteToMySQL(String c) {
         String convertedjson = c;
         String fields = "";
         String values = "";

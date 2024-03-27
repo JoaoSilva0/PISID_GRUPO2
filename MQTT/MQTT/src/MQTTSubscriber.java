@@ -10,11 +10,12 @@ public class MQTTSubscriber {
     }
 
     public static void main(String[] args) {
+        MQTTSubscriber mqttSubscriber = new MQTTSubscriber(new WriteMySql());
         String broker = "tcp://broker.mqtt-dashboard.com:1883";
         String clientId = "JavaMQTTSubscriber";
         MemoryPersistence persistence = new MemoryPersistence();
         try {
-            WriteMySql.connectDatabase_to();
+            writeMySql.connectDatabase_to();
            // WriteMySql.writeConfiguration();
             MqttClient mqttClient = new MqttClient(broker, clientId, persistence);
             mqttClient.setCallback(new MqttCallback() {
@@ -28,12 +29,11 @@ public class MQTTSubscriber {
                     System.out.println("Mensagem recebida:");
                     System.out.println("   Tópico: " + topic);
                     System.out.println("   Mensagem: " + new String(message.getPayload()));
-                    WriteMySql.WriteToMySQL(new String(message.getPayload()));
+                    //writeMySql.WriteToMySQL(new String(message.getPayload()));
                 }
 
                 @Override
                 public void deliveryComplete(IMqttDeliveryToken token) {
-                    // Este método é chamado quando a mensagem foi entregue ao broker MQTT com sucesso.
                 }
             });
 
