@@ -29,7 +29,7 @@ public class MQTTSubscriber {
                     System.out.println("Mensagem recebida:");
                     System.out.println("   Tópico: " + topic);
                     System.out.println("   Mensagem: " + new String(message.getPayload()));
-                    //writeMySql.WriteToMySQL(new String(message.getPayload()));
+                    writeMySql.WriteToMySQL(new String(message.getPayload()));
                 }
 
                 @Override
