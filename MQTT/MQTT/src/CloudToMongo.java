@@ -43,7 +43,6 @@ public class CloudToMongo implements MqttCallback {
         }
     }
 
-
     private static Properties loadConfig() throws IOException {
         Properties properties = new Properties();
         try (FileInputStream fis = new FileInputStream(CONFIG_FILE)) {
@@ -104,6 +103,8 @@ public class CloudToMongo implements MqttCallback {
         db = mongoClient.getDB(mongoDatabase);
     }
 
+
+    //TO-DO ARREDONDAR VALORES 
     @Override
     public void messageArrived(String topic, MqttMessage message) throws Exception {
         DBCollection collection;
@@ -153,12 +154,7 @@ public class CloudToMongo implements MqttCallback {
         } else {
             document_json = (DBObject) JSON.parse(message.toString());
         }
-        
-        //String broker = "tcp://broker.mqtt-dashboard.com:1883";
-        //String clientId = "JavaMongoToMQTT";
-        //MqttClient mqttClient = new MqttClient(broker, clientId);
-        //qttClient.publish("pisid_grupo2_joaosilva_passagem",message);
-       // SendToMQTT();
+
         collection.insert(document_json);
         documentLabel.append(message.toString() + "\n");
     }
@@ -172,7 +168,5 @@ public class CloudToMongo implements MqttCallback {
     }
 
     public void SendToMQTT(String message,String broker,String clientId){
-       
-        
     }
 }

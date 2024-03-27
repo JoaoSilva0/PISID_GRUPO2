@@ -67,7 +67,7 @@ public class MongoToMQTT {
     
         Document query = new Document();
         if (lastProcessedId != null) {
-            query.append("_id", new Document("$gt", lastProcessedId));
+            //query.append("_id", new Document("$gt", lastProcessedId));
         }
         
         for (Document doc : collection.find(query)) {

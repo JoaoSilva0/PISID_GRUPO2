@@ -1,5 +1,4 @@
 import java.io.FileInputStream;
-import java.io.IOException;
 import java.sql.Connection;
 import java.sql.DriverManager;
 import java.sql.Statement;
@@ -15,7 +14,6 @@ public class WriteMySql {
     static String sql_database_password_to = "";
     static String sql_database_user_to = "";
     static String sql_table_to = "";
-    private static final String BDCloud = "BDCloud.ini";
 
     private static void createWindow() {
         JFrame frame = new JFrame("Data Bridge");
@@ -39,7 +37,7 @@ public class WriteMySql {
     }
 
     public static void main(String[] args) {
-        createWindow();
+        WriteToMySQL("{\"_id\": {\"$oid\": \"65f7193bad7d8b40ac47eca5\"}, \"Hora\": \"2024-03-17 16:24:27.352877\", \"Leitura\": 5, \"Sensor\": 2}");
         try {
             Properties p = new Properties();
             p.load(new FileInputStream("WriteMysql.ini"));
@@ -73,6 +71,8 @@ public class WriteMySql {
         }
     }
 
+    // Método ReadData removido, pois não estava sendo utilizado e causaria um erro de compilação
+
     public static void WriteToMySQL(String c) {
         String convertedjson = c;
         String fields = "";
@@ -85,14 +85,14 @@ public class WriteMySql {
         String x = convertedjson.toString();
         String[] splitArray = x.split(",");
         for (int i = 0; i < splitArray.length; i++) {
-            String[] splitArray2 = splitArray[i].split(" :");
+            String[] splitArray2 = splitArray[i].split(": ");
             if (i == 0) fields = splitArray2[0];
             else fields = fields + ", " + splitArray2[0];
             if (i == 0) values = splitArray2[1];
             else values = values + ", " + splitArray2[1];
         }
         fields = fields.replace("\"", "");
-        SqlCommando = "Insert into " + sql_table_to + " (" + fields.substring(7, fields.length()) + ") values (" + values.substring(11, values.length() - 1) + ");";
+        SqlCommando = "Insert into" + sql_table_to + " (" + fields.substring(7, fields.length()) + ") values (" + values.substring(10, values.length() - 1) + ");";
         try {
             documentLabel.append(SqlCommando.toString() + "\n");
         } catch (Exception e) {
@@ -107,41 +107,4 @@ public class WriteMySql {
             System.out.println(SqlCommando);
         }
     }
-
-    // public static void writeConfiguration(){
-    //     String url_cloud = "";
-    //     String username_cloud = "";
-    //     String password_cloud = "";
-    //     try {
-    //         Properties p = new Properties();
-    //         p.load(new FileInputStream("BD Cloud.ini"));
-    //         url_cloud = p.getProperty("url_cloud");
-    //         username_cloud = p.getProperty("username_cloud");
-    //         password_cloud = p.getProperty("password_cloud");
-    //     } catch (Exception e) {
-    //         System.out.println("Error reading BD Cloud.ini file: " + e.getMessage());
-    //         return;
-    //     }
-
-    //     try {
-    //         // Estabelecer conexão com o banco de dados
-    //         Class.forName("org.mariadb.jdbc.Driver");
-    //         connTo = DriverManager.getConnection(url_cloud, username_cloud, password_cloud);
-    //         System.out.println("Connection to MariaDB Destination " + url_cloud + " succeeded");
-
-    //         // Executar as operações no banco de dados (por exemplo, inserção de dados)
-    //         Statement statement = connTo.createStatement();
-    //         statement.executeUpdate("INSERT INTO configuracaolabirinto (temperaturaprogramada, numerodesalas) VALUES (25.0, 10)");
-    //         statement.executeUpdate("INSERT INTO corredor (salaa, salab, centimetro) VALUES (1, 2, 100)");
-    //         statement.close();
-
-    //         // Fechar a conexão após o uso
-    //         connTo.close();
-    //     } catch (Exception e) {
-    //         System.out.println("Error writing to MySQL database: " + e.getMessage());
-    //     }
-    
-
-    // }
-
 }
