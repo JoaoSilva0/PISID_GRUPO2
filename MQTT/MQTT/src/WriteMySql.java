@@ -13,7 +13,7 @@ public class WriteMySql {
     static String sql_database_connection_to = "";
     static String sql_database_password_to = "";
     static String sql_database_user_to = "";
-    static String sql_table_to = "";
+    static String[] sql_table_to = {"medicoespassagem", "medicoestemperatura"};
 
     private void createWindow() {
         JFrame frame = new JFrame("Data Bridge");
@@ -40,7 +40,6 @@ public class WriteMySql {
         try {
             Properties p = new Properties();
             p.load(new FileInputStream("WriteMysql.ini"));
-            sql_table_to = p.getProperty("sql_table_to");
             sql_database_connection_to = p.getProperty("sql_database_connection_to");
             sql_database_password_to = p.getProperty("sql_database_password_to");
             sql_database_user_to = p.getProperty("sql_database_user_to");
@@ -55,7 +54,6 @@ public class WriteMySql {
         try {
             Properties p = new Properties();
             p.load(new FileInputStream("WriteMysql.ini"));
-            sql_table_to = p.getProperty("sql_table_to");
             sql_database_connection_to = p.getProperty("sql_database_connection_to");
             sql_database_password_to = p.getProperty("sql_database_password_to");
             sql_database_user_to = p.getProperty("sql_database_user_to");
@@ -69,7 +67,7 @@ public class WriteMySql {
         }
     }
 
-    public void WriteToMySQL(String c) {
+    public void WriteToMySQL(String c, String table) {
         String convertedjson = c;
         String fields = "";
         String values = "";
@@ -88,7 +86,12 @@ public class WriteMySql {
             else values = values + ", " + splitArray2[1];
         }
         fields = fields.replace("\"", "");
-        SqlCommando = "Insert into" + sql_table_to + " (" + fields.substring(7, fields.length()) + ") values (" + values.substring(10, values.length() - 1) + ");";
+        if(table == "pisid_grupo2_passagem") {
+            SqlCommando = "Insert into" + sql_table_to[0] + " (" + fields.substring(7, fields.length()) + ") values (" + values.substring(10, values.length() - 1) + ");";
+        } else {
+            SqlCommando = "Insert into" + sql_table_to[1] + " (" + fields.substring(7, fields.length()) + ") values (" + values.substring(10, values.length() - 1) + ");";
+        }
+        
         try {
             documentLabel.append(SqlCommando.toString() + "\n");
         } catch (Exception e) {

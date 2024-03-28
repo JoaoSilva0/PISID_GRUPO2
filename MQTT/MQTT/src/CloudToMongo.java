@@ -105,6 +105,7 @@ public class CloudToMongo implements MqttCallback {
 
 
     //TO-DO ARREDONDAR VALORES 
+    //TO-DO limpar dados mongo no inicio
     @Override
     public void messageArrived(String topic, MqttMessage message) throws Exception {
         DBCollection collection;

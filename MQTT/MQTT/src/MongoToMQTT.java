@@ -7,16 +7,12 @@ import org.bson.Document;
 import org.bson.types.ObjectId;
 import org.eclipse.paho.client.mqttv3.*;
 
-import java.util.concurrent.ExecutionException;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
-import java.util.concurrent.Future;
 import java.util.concurrent.TimeUnit;
 
 public class MongoToMQTT {
-    static ObjectId objectId1 = null;
-    static ObjectId objectId2 = null;
-    
+   
     public static void main(String[] args) throws InterruptedException {
         // MongoDB Configuration
         MongoClient mongoClient = new MongoClient("localhost", 27017);
