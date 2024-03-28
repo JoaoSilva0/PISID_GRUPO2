@@ -86,10 +86,11 @@ public class WriteMySql {
             else values = values + ", " + splitArray2[1];
         }
         fields = fields.replace("\"", "");
-        if(table == "pisid_grupo2_passagem") {
-            SqlCommando = "Insert into" + sql_table_to[0] + " (" + fields.substring(7, fields.length()) + ") values (" + values.substring(10, values.length() - 1) + ");";
+        System.out.println(table);
+        if(table.equals("pisid_grupo2_passagem")) {
+            SqlCommando = "Insert into " + sql_table_to[0] + " (" + fields.substring(7, fields.length()) + ") values (" + values.substring(8, values.length() - 1) + ");";
         } else {
-            SqlCommando = "Insert into" + sql_table_to[1] + " (" + fields.substring(7, fields.length()) + ") values (" + values.substring(10, values.length() - 1) + ");";
+            SqlCommando = "Insert into " + sql_table_to[1] + " (" + fields.substring(7, fields.length()) + ") values (" + values.substring(8, values.length() - 1) + ");";
         }
         
         try {
