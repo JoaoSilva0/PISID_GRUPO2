@@ -139,6 +139,7 @@ public class CloudToMongo implements MqttCallback {
             String nullMessage = payloadAsString.replace(payloadAsString, mensagemAnomala);
             document_json = (DBObject) JSON.parse(nullMessage);
 
+            //??? LOCALDATE.NOW()??
         } else if (!message.toString().contains(LocalDate.now().toString())) {
             
             String[] split_time = new String(message.getPayload()).split(",");
