@@ -51,7 +51,7 @@ public class MongoToMQTT {
             }
             
             // Delay between iterations
-            Thread.sleep(5000);
+            Thread.sleep(1000);
         }
     }
     
@@ -63,7 +63,7 @@ public class MongoToMQTT {
     
         Document query = new Document();
         if (lastProcessedId != null) {
-            //query.append("_id", new Document("$gt", lastProcessedId));
+            query.append("_id", new Document("$gt", lastProcessedId));
         }
         
         for (Document doc : collection.find(query)) {
