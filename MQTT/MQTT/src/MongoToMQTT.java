@@ -15,7 +15,7 @@ public class MongoToMQTT {
    
     public static void main(String[] args) throws InterruptedException {
         // MongoDB Configuration
-        MongoClient mongoClient = new MongoClient("localhost", 27017);
+        MongoClient mongoClient = new MongoClient("localhost", 27019);
         MongoDatabase database = mongoClient.getDatabase("ExperienciaRatos");
         
         // MongoDB Collections

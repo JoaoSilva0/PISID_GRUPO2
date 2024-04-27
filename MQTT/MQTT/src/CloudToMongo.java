@@ -93,16 +93,40 @@ public class CloudToMongo implements MqttCallback {
         String mongoAuthentication = p.getProperty("mongo_authentication");
         String mongoDatabase = p.getProperty("mongo_database");
         String mongoCollection = p.getProperty("mongo_collection");
-
-        mongoURI += mongoAuthentication.equals("true") ? (mongoUser + ":" + mongoPassword + "@") : "";
+    
+        if (mongoAuthentication.equals("true")) {
+            mongoURI += mongoUser + ":" + mongoPassword + "@";
+        }
         mongoURI += mongoAddress;
-        mongoURI += mongoReplica.equals("false") ? "" : ("/?replicaSet=" + mongoReplica);
-        mongoURI += mongoAuthentication.equals("true") ? "/?authSource=admin" : "";
-
+    
+        // Ensure there's a trailing slash before adding query parameters
+        if (!mongoURI.endsWith("/")) {
+            mongoURI += "/";
+        }
+    
+        String queryParameters = "";
+    
+        if (!mongoReplica.equals("false")) {
+            queryParameters = "?replicaSet=" + mongoDatabase;
+        }
+    
+        if (mongoAuthentication.equals("true")) {
+            if (queryParameters.isEmpty()) {
+                queryParameters = "?authSource=admin";
+            } else {
+                queryParameters += "&authSource=admin";
+            }
+        }
+    
+        mongoURI += queryParameters;
+    
         MongoClient mongoClient = new MongoClient(new MongoClientURI(mongoURI));
         db = mongoClient.getDB(mongoDatabase);
     }
-
+    
+    
+    
+    
 
     //TO-DO ARREDONDAR VALORES 
     //TO-DO limpar dados mongo no inicio
