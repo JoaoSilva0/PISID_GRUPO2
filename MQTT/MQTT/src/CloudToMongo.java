@@ -5,7 +5,6 @@ import org.eclipse.paho.client.mqttv3.MqttException;
 import org.eclipse.paho.client.mqttv3.MqttMessage;
 import com.mongodb.*;
 import com.mongodb.util.JSON;
-
 import javax.swing.*;
 import java.awt.*;
 import java.awt.event.*;
@@ -121,6 +120,13 @@ public class CloudToMongo implements MqttCallback {
     
         MongoClient mongoClient = new MongoClient(new MongoClientURI(mongoURI));
         db = mongoClient.getDB(mongoDatabase);
+        DBCollection medicoesPassagem = db.getCollection("medicoesPassagem");
+        DBCollection medicoesTemperatura = db.getCollection("medicoesTemperatura");
+
+        // Remove all documents from these collections
+        medicoesPassagem.remove(new BasicDBObject());
+        medicoesTemperatura.remove(new BasicDBObject());
+
     }
     
     
